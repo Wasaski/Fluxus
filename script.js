@@ -37,7 +37,7 @@ function type() {
 
 // 2. Motion Animation no Scroll (Intersection Observer)
 const revealOptions = {
-    threshold: 0.2,
+    threshold: 0.1,
     rootMargin: "0px 0px -50px 0px"
 };
 
