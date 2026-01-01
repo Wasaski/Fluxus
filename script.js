@@ -65,3 +65,41 @@ window.addEventListener('scroll', () => {
         header.style.background = 'rgba(5, 5, 5, 0.8)';
     }
 });
+
+// Contador de Visualizações Simplificado e Robusto
+async function updateViewCount() {
+    const viewElement = document.getElementById('view-count');
+    // Namespace único para o seu site
+    const namespace = 'fluxustore.com.br';
+    const key = 'visitas_totais';
+
+    try {
+        const hasVisited = localStorage.getItem('fluxus_v3_visited');
+        let url = `https://api.countapi.xyz/get/${namespace}/${key}`;
+
+        // Se for a primeira vez, usa o endpoint de incremento (hit)
+        if (!hasVisited) {
+            url = `https://api.countapi.xyz/hit/${namespace}/${key}`;
+            localStorage.setItem('fluxus_v3_visited', 'true');
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data && data.value) {
+            viewElement.textContent = `${data.value.toLocaleString()} visualizações`;
+        } else {
+            // Se a API retornar sucesso mas sem valor (raro), mostra 1
+            viewElement.textContent = '1 visualização';
+        }
+    } catch (error) {
+        // Fallback para não ficar "Buscando..." ou "Conectado"
+        viewElement.textContent = '1 visualização';
+        console.error('Erro no contador:', error);
+    }
+}
+
+window.addEventListener('load', () => {
+    revealOnScroll();
+    updateViewCount();
+});
