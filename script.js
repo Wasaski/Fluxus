@@ -66,36 +66,34 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Contador de Visualizações Simplificado e Robusto
+// Contador de Visualizações Global e Persistente
 async function updateViewCount() {
     const viewElement = document.getElementById('view-count');
-    // Namespace único para o seu site
-    const namespace = 'fluxustore.com.br';
+    // Namespace único para garantir que a contagem seja global e não resete
+    const namespace = 'fluxus_design_v4';
     const key = 'visitas_totais';
 
     try {
-        const hasVisited = localStorage.getItem('fluxus_v3_visited');
-        let url = `https://api.countapi.xyz/get/${namespace}/${key}`;
+        const hasVisited = localStorage.getItem('fluxus_prod_visited');
+        // Se é a primeira vez desse navegador, usamos 'up' para somar +1 global
+        // Se já visitou, usamos apenas o link da chave para buscar o valor atual
+        let url = `https://api.counterapi.dev/v1/${namespace}/${key}`;
 
-        // Se for a primeira vez, usa o endpoint de incremento (hit)
         if (!hasVisited) {
-            url = `https://api.countapi.xyz/hit/${namespace}/${key}`;
-            localStorage.setItem('fluxus_v3_visited', 'true');
+            url = `https://api.counterapi.dev/v1/${namespace}/${key}/up`;
+            localStorage.setItem('fluxus_prod_visited', 'true');
         }
 
         const response = await fetch(url);
         const data = await response.json();
 
-        if (data && data.value) {
-            viewElement.textContent = `${data.value.toLocaleString()} visualizações`;
-        } else {
-            // Se a API retornar sucesso mas sem valor (raro), mostra 1
-            viewElement.textContent = '1 visualização';
+        if (data && data.count !== undefined) {
+            // Exibe a contagem real de todas as pessoas que já entraram
+            viewElement.textContent = `${data.count.toLocaleString()} visualizações`;
         }
     } catch (error) {
-        // Fallback para não ficar "Buscando..." ou "Conectado"
-        viewElement.textContent = '1 visualização';
         console.error('Erro no contador:', error);
+        viewElement.textContent = 'Site Protegido';
     }
 }
 
