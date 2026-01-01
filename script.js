@@ -1,80 +1,23 @@
-// 1. Digitalização de Textos (Typewriter Effect)
-const texts = [
-    "LOGOS_QUE_REDEFINEM_PADRÕES",
-    "CÓDIGO_LIMPO_DESIGN_VIVO",
-    "SISTEMAS_VISUAIS_DE_ALTA_PERFORMANCE",
-    "FLUXUS_O_FUTURO_DA_SUA_MARCA"
-];
+// Proteção contra Cópia e Salvamento
+document.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+}, false);
 
-let textIndex = 0;
-let charIndex = 0;
-let isDeleting = false;
-const typewriterElement = document.getElementById('typewriter');
-
-function type() {
-    const currentText = texts[textIndex];
-    if (isDeleting) {
-        typewriterElement.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-    } else {
-        typewriterElement.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
-    }
-
-    let typeSpeed = isDeleting ? 50 : 100;
-
-    if (!isDeleting && charIndex === currentText.length) {
-        isDeleting = true;
-        typeSpeed = 2000; // Pausa no final da frase
-    } else if (isDeleting && charIndex === 0) {
-        isDeleting = false;
-        textIndex = (textIndex + 1) % texts.length;
-        typeSpeed = 500;
-    }
-
-    setTimeout(type, typeSpeed);
-}
-
-// 2. Motion Animation no Scroll (Intersection Observer)
-const revealOptions = {
-    threshold: 0.1,
-    rootMargin: "0px 0px -50px 0px"
-};
-
-const productObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-            observer.unobserve(entry.target);
-        }
-    });
-}, revealOptions);
-
-// 3. Header Dynamic State
-const header = document.querySelector('header');
-const logo = document.querySelector('.logo-img');
-
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        header.style.padding = '10px 0';
-        header.style.background = 'rgba(13, 13, 13, 0.95)';
-        logo.style.height = '60px';
-    } else {
-        header.style.padding = '20px 0';
-        header.style.background = 'rgba(13, 13, 13, 0.8)';
-        logo.style.height = '100px';
+document.addEventListener('keydown', (e) => {
+    // Bloquear Ctrl+U, Ctrl+S e F12
+    if (e.ctrlKey && (e.key === 'u' || e.key === 's' || e.key === 'p') || e.keyCode === 123) {
+        e.preventDefault();
+        return false;
     }
 });
 
-// Inicialização
-document.addEventListener('DOMContentLoaded', () => {
-    type();
-    document.querySelectorAll('.product-card').forEach(card => {
-        productObserver.observe(card);
-    });
+document.addEventListener('dragstart', (e) => {
+    if (e.target.nodeName === 'IMG') {
+        e.preventDefault();
+    }
 });
 
-// Smooth Scroll
+// Smooth Scroll para navegação
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -86,4 +29,39 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             });
         }
     });
+});
+
+// Revelação suave de elementos ao rolar
+const revealElements = document.querySelectorAll('.product-card, .payment-card');
+const revealOnScroll = () => {
+    const triggerBottom = window.innerHeight * 0.85;
+    revealElements.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < triggerBottom) {
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }
+    });
+};
+
+// Estado inicial para animações
+revealElements.forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+});
+
+window.addEventListener('scroll', revealOnScroll);
+window.addEventListener('load', revealOnScroll);
+
+// Ajuste dinâmico do cabeçalho
+const header = document.querySelector('header');
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+        header.style.padding = '12px 0';
+        header.style.background = 'rgba(5, 5, 5, 0.95)';
+    } else {
+        header.style.padding = '20px 0';
+        header.style.background = 'rgba(5, 5, 5, 0.8)';
+    }
 });
